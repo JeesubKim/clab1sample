@@ -7,10 +7,10 @@
 
 
 import React, {useEffect, useState, useRef} from 'react';
-import {IconButton,Container,AppBar,Toolbar,Typography,Button,Paper,InputBase,CircularProgress,Switch } from '@material-ui/core/'
+import {IconButton,Container,AppBar,Toolbar,Typography,Button,Paper,InputBase,CircularProgress,Switch,Badge } from '@material-ui/core/'
 import { fade, makeStyles } from '@material-ui/core/styles';
 import MenuIcon from '@material-ui/icons/Menu';
-
+import Fade from '@material-ui/core/Fade';
 import Avatar from '@material-ui/core/Avatar';
 
 import FaceIcon from '@material-ui/icons/Face';
@@ -23,13 +23,14 @@ import Accordion from '@material-ui/core/Accordion';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 
+import MailIcon from '@material-ui/icons/Mail'
 import MediaCard from './MediaCard';
 
 
 import ssd1image from './ssd.PNG'
 import ssd2image from './ssd2.PNG'
 import covid19 from './covid19.PNG'
-import champs from './champs.PNG'
+import champsImg from './champs.PNG'
 import coman from './coman.PNG'
 import stock from './stock.PNG'
 import covidmap from './covidmap.png'
@@ -40,8 +41,21 @@ import MemoryIcon from '@material-ui/icons/Memory';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import NotListedLocationIcon from '@material-ui/icons/NotListedLocation';
 import SportsSoccerIcon from '@material-ui/icons/SportsSoccer';
+import Snackbar from '@material-ui/core/Snackbar';
+import Slide from '@material-ui/core/Slide';
+import MuiAlert from '@material-ui/lab/Alert';
 
+const defaultProps = {
+  color: 'secondary',
+  children: <MailIcon />
+};
 const useStyles = makeStyles((theme) => ({
+  rootAlert: {
+    width: '100%',
+    '& > * + *': {
+      marginTop: theme.spacing(2),
+    },
+  },
   root: {
     flexGrow: 1,
   },
@@ -104,7 +118,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const samsung = {
-  title:'삼성전자 삼성 860 EVO 시리즈',
+  title:'삼성전자 SSD 삼성 860 EVO 시리즈',
   paragraph:'최저56,890원 - 용산전자상가 https://smartstore.naver.com/navy6825/products/4331033218?NaPm=ct%3Dkeefv3cg%7Cci%3D894d10e698dd5159d368c9d1551e6dcc1cb59380%7Ctr%3Dslsbrc%7Csn%3D194454%7Cic%3D%7Chk%3Dfc1399e386e0e3ff67cb6e5dee8dba80d093f650'
 }
 const samsung2 = {
@@ -116,7 +130,7 @@ function addChip(Component,title,color){
 }
 
 let mchiplist = [
-  // addChip(MemoryIcon, "삼성 SSD 860 PRO 최저가", "primary"),
+  
   addChip(AcUnitIcon, "COVID19 현황", "secondary"),
   addChip(NotListedLocationIcon, "확진자 동선", "secondary"),
   addChip(TrendingUpIcon, "삼성전자 주가", "primary"),
@@ -136,11 +150,44 @@ function App(props){
 
   const [chiplist, setChiplist] = React.useState(null);
   const [scenario, setScenario] = React.useState(false);
+  const [vis, setVis] = React.useState(false);
+
+  const [covidNum, setCovidNum] = React.useState(1);
+  const [champs, setChamps] = React.useState(2);
+
+  const [open, setOpen] = React.useState(false);
+
+  const [message, setMessage] = React.useState('');
+
+  const handleClick = (msg) => {
+    setMessage(msg);
+    setOpen(true);
+    
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+  
   useEffect(()=>{
     // setChiplist(chiplist);
     console.log('app.js useEffect')
     setChiplist(mchiplist);
-  })
+    setTimeout(()=>{
+      setCovidNum(covidNum+1);
+      handleClick("New Report - 확진자 동선");
+    }, 12000);
+
+    setTimeout(()=>{
+      setChamps(champs+1);
+      handleClick("New Report - 챔피언스리그");
+    },3000)
+  },[])
   
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
@@ -150,8 +197,13 @@ function App(props){
   const listhandleChange = (event) => {
     setState({ ...state, [event.target.name]: event.target.checked });
   };
+
+  function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+  }
+  // setInterval(()=>{ setCovidNum(covidNum+1);},5000)
   return (
-    <div>
+    <div style={{marginTop:'50px'}}>
       <Container maxWidth='sm'>
         <AppBar position="static">
           <Toolbar>
@@ -185,8 +237,15 @@ function App(props){
                     
                     let edValue = document.getElementById("edValue");
                     // console.log(edValue);
-                    if(edValue.value === '삼성 SSD 860 PRO 최저가'){
-                      setTimeout(()=>{setScenario(true)},3000);
+                    if(edValue.value === '삼성 SSD 860 EVO 최저가'){
+
+                      setVis(true);
+                      setTimeout(()=>{
+                        setScenario(true)
+                        setVis(false);
+                        handleClick("New Report - 삼성 SSD 860 EVO 최저가");
+                      },3000);
+                      
                     }
                     edValue.value='';
                   }
@@ -225,7 +284,9 @@ function App(props){
           aria-controls="panel2bh-content"
           id="panel2bh-header"
         >
-          <Typography className={classes.heading}>COVID19 현황</Typography>
+          <Badge badgeContent={1} max={50} {...defaultProps}/>
+          <div style={{marginRight:'10px'}}/>
+          <Typography className={classes.heading} >COVID19 현황</Typography>
           <Typography className={classes.secondaryHeading}>
             확진환자 19,400, 검사진행 54,046, 완치자 14,765, 사망자 321
           </Typography>
@@ -242,13 +303,17 @@ function App(props){
           aria-controls="panel3bh-content"
           id="panel3bh-header"
         >
+          <Badge badgeContent={covidNum} max={50} {...defaultProps}/>
+          <div style={{marginRight:'10px'}}/>
           <Typography className={classes.heading}>확진자 동선</Typography>
           <Typography className={classes.secondaryHeading}>
             화성시 확진자 동선
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
-        <MediaCard title={'화성시 확진자 동선 지도'} paragraph={'100번(송산면) 확진자 발생'} image={covidmap}/>
+        {covidNum>1&&<MediaCard title={'화성시(석우동, 송산면) 확진자 동선 지도'} paragraph={'99번(석우동), 100번(송산면) 확진자 발생'} image={covidmap}/>}
+        <MediaCard title={'화성시 (반월동) 확진자 동선 지도'} paragraph={'98번(반월동) 확진자 발생'} image={covidmap}/>
+        
         </AccordionDetails>
       </Accordion>
       <Accordion expanded={expanded === 'panel4'} onChange={handleChange('panel4')}>
@@ -257,14 +322,17 @@ function App(props){
           aria-controls="panel4bh-content"
           id="panel4bh-header"
         >
+          <Badge badgeContent={2} max={50} {...defaultProps}/>
+          <div style={{marginRight:'10px'}}/>
           <Typography className={classes.heading}>삼성전자 주가</Typography>
           <Typography className={classes.secondaryHeading}>
           55,400 전일대비 하락 200 (-0.36%)
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
+        <MediaCard title={'2020-08-28 주가'} paragraph={'55,600 전일대비 하락 200 (-1.42%)'} image={stock}/>
         <MediaCard title={'2020-08-27 주가'} paragraph={'55,400 전일대비 하락 100 (-0.36%)'} image={stock}/>
-          <MediaCard title={'2020-08-28 주가'} paragraph={'55,600 전일대비 하락 200 (-1.42%)'} image={stock}/>
+          
           
         </AccordionDetails>
       </Accordion>
@@ -275,13 +343,15 @@ function App(props){
           aria-controls="panel5bh-content"
           id="panel5bh-header"
         >
+          <Badge badgeContent={champs} max={50} {...defaultProps}/>
+          <div style={{marginRight:'10px'}}/>
           <Typography className={classes.heading}>챔피언스리그</Typography>
           <Typography className={classes.secondaryHeading}>
           19-20 챔피언스 리그, 뮌헨 우승 : 뮌헨 1 vs 0 파리 생제르망
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
-        <MediaCard title={'챔피언스리그'} paragraph={'19-20 챔피언스 리그, 뮌헨 우승 : 뮌헨 1 vs 0 파리 생제르망'} image={champs}/>
+        <MediaCard title={'챔피언스리그'} paragraph={'19-20 챔피언스 리그, 뮌헨 우승 : 뮌헨 1 vs 0 파리 생제르망'} image={champsImg}/>
         <MediaCard title={'뮌헨 결승골'} paragraph={'‘결승골’ 코망, 챔피언스리그 결승전 MOM 선정'} image={coman}/>
         
         </AccordionDetails>
@@ -292,16 +362,35 @@ function App(props){
           aria-controls="panel1bh-content"
           id="panel1bh-header"
         >
-          <Typography className={classes.heading}>삼성 SSD 860 PRO 최저가</Typography>
+          <Badge badgeContent={2} max={50} {...defaultProps}/>
+          <div style={{marginRight:'10px'}}/>
+          <Typography className={classes.heading}>삼성 SSD 860 EVO 최저가</Typography>
           <Typography className={classes.secondaryHeading}>56,890원 - 용산상가</Typography>
         </AccordionSummary>
         <AccordionDetails>
 
-          <MediaCard title={samsung.title} paragraph={samsung.paragraph} image={ssd1image}/>
+          <MediaCard title={samsung.title} paragraph={samsung.paragraph} image={ssd1image} />
           <MediaCard title={samsung2.title} paragraph={samsung2.paragraph} image={ssd2image}/>
         </AccordionDetails>
       </Accordion>}
+
+      {vis && <CircularProgress style={{textAlign:'center', display:'block',margin:'auto', marginTop:'10px'}}/>}
+      
+
+      <div className={classes.rootAlert}>
+
+      
+        <Snackbar open={open} autoHideDuration={6000}  TransitionComponent={Fade} onClose={handleClose} >
+          <Alert onClose={handleClose} severity="success">
+            {message}
+          </Alert>
+        </Snackbar>
+        
+
+      </div>
+
     </div>
+
 
         {/* <CircularProgress className={classes.root}/>
         <Switch className={classes.root}
@@ -311,6 +400,8 @@ function App(props){
           name="checkedB"
           inputProps={{ 'aria-label': 'primary checkbox' }}
       /> */}
+
+
       </Container>
   </div>
   )

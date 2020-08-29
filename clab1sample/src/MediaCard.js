@@ -7,6 +7,7 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import Link  from '@material-ui/core/Link'
 
 
 const useStyles = makeStyles({
@@ -23,15 +24,16 @@ export default function MediaCard(props) {
   const classes = useStyles();
 
   return (
-    <Card className={classes.root}>
+    <Link href='https://m.smartstore.naver.com/navy6825/products/4331033218?NaPm='>
+    <Card className={classes.root} >
       <CardActionArea>
         <CardMedia
           className={classes.media}
           image={props.image}
-          title="Contemplative Reptile"
+          title="삼성전자 SSD"
           style={{marginTop:'20px',width:'100%'}}
         />
-        <CardContent  style={{height:'100px'}}>
+        <CardContent  style={props.title.includes('SSD')?{height:'250px'}:{height:'100px'}}>
           <Typography gutterBottom variant="h5" component="h2">
             {props.title}
           </Typography>
@@ -49,5 +51,6 @@ export default function MediaCard(props) {
         </Button>
       </CardActions>
     </Card>
+    </Link>
   );
 }
